@@ -17,6 +17,33 @@ php artisan migrate --seed
 
 `DatabaseSeeder` cria as definições iniciais sem substituir valores já configurados. Em `local` e `testing`, também cria contas de demonstração e a disponibilidade do intermediário. Estas contas são fictícias e pré-aprovadas apenas para facilitar testes; o registo normal de proprietário/intermediário continua a exigir revisão. Os dados de demonstração não são semeados noutros ambientes.
 
+### Executar com Docker Compose
+
+Requer Docker Engine com o plugin `docker compose`. O Compose inicia a API na porta `3043`, MySQL e o scheduler Laravel; na primeira inicialização gera `APP_KEY` e executa as migrations. Os seeders de demonstração só correm quando `APP_ENV=local`.
+
+```powershell
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+# Configure APP_URL, COMPOSE_DB_PASSWORD, COMPOSE_DB_ROOT_PASSWORD e as credenciais Ombala/GPO no .env.
+docker compose up --build -d
+docker compose logs -f app
+```
+
+A API fica disponível em `http://<ip-ou-dominio-da-vps>:3043` (ou na porta definida por `APP_PORT`). Abra essa porta no firewall/security group da VPS. A porta MySQL não é publicada no host; a API liga-se ao banco pela rede interna do Compose. Os dados do MySQL e os ficheiros da aplicação persistem em volumes Docker. Defina senhas fortes em `COMPOSE_DB_PASSWORD` e `COMPOSE_DB_ROOT_PASSWORD` antes de iniciar. Configure `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL` e `PAYMENT_GATEWAY=gpo` no `.env`; a chave gerada é gravada nesse ficheiro.
+
+Para parar sem apagar dados:
+
+```powershell
+docker compose down
+```
+
+Para apagar também a base de dados e os ficheiros persistidos:
+
+```powershell
+docker compose down --volumes
+```
+
+O Compose publica HTTP na porta 3043; em produção, termine TLS num proxy reverso (por exemplo, Nginx) e restrinja o acesso direto à porta conforme necessário. Guarde o `.env` fora do controlo de versão e use uma estratégia controlada para migrations e backups.
+
 Emails de teste:
 
 - `admin@intermediarius.test`
