@@ -19,27 +19,27 @@ php artisan migrate --seed
 
 ### Executar com Docker Compose
 
-Requer Docker Engine com o plugin `docker compose`. O Compose inicia a API na porta `3043`, MySQL e o scheduler Laravel; na primeira inicialização gera `APP_KEY` e executa as migrations. Os seeders de demonstração só correm quando `APP_ENV=local`.
+Requer Docker Engine e Docker Compose. O Compose inicia a API na porta `3043` e o scheduler Laravel; conecta ao MySQL já existente na VPS pela porta `3306`. Na primeira inicialização gera `APP_KEY` e executa as migrations. O Compose fixa `APP_ENV=production`, portanto não cria contas de demonstração.
 
 ```powershell
 if (-not (Test-Path .env)) { Copy-Item .env.example .env }
-# Configure APP_URL, COMPOSE_DB_PASSWORD, COMPOSE_DB_ROOT_PASSWORD e as credenciais Ombala/GPO no .env.
-docker compose up --build -d
-docker compose logs -f app
+# Configure APP_URL, DB_DATABASE, DB_USERNAME, DB_PASSWORD e as credenciais Ombala/GPO no .env.
+docker-compose up --build -d
+docker-compose logs -f app
 ```
 
-A API fica disponível em `http://<ip-ou-dominio-da-vps>:3043` (ou na porta definida por `APP_PORT`). Abra essa porta no firewall/security group da VPS. A porta MySQL não é publicada no host; a API liga-se ao banco pela rede interna do Compose. Os dados do MySQL e os ficheiros da aplicação persistem em volumes Docker. Defina senhas fortes em `COMPOSE_DB_PASSWORD` e `COMPOSE_DB_ROOT_PASSWORD` antes de iniciar. Configure `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL` e `PAYMENT_GATEWAY=gpo` no `.env`; a chave gerada é gravada nesse ficheiro.
+A API fica disponível em `http://<ip-ou-dominio-da-vps>:3043` (ou na porta definida por `APP_PORT`). Abra essa porta no firewall/security group da VPS. O Compose força `APP_ENV=production` e `APP_DEBUG=false`. Não publica nem cria outro MySQL: por padrão, `host.docker.internal` aponta para a VPS, onde o container MySQL existente precisa publicar a porta `3306`. Se necessário, altere `COMPOSE_DB_HOST`. Crie no MySQL o banco e um utilizador dedicado com permissões para esse banco; evite usar `root`. Os ficheiros da aplicação persistem em volume Docker. Configure `APP_URL` e `PAYMENT_GATEWAY=gpo` no `.env`; a chave gerada é gravada nesse ficheiro.
 
 Para parar sem apagar dados:
 
 ```powershell
-docker compose down
+docker-compose down
 ```
 
-Para apagar também a base de dados e os ficheiros persistidos:
+Para apagar o volume de ficheiros da aplicação (não apaga dados do MySQL externo):
 
 ```powershell
-docker compose down --volumes
+docker-compose down --volumes
 ```
 
 O Compose publica HTTP na porta 3043; em produção, termine TLS num proxy reverso (por exemplo, Nginx) e restrinja o acesso direto à porta conforme necessário. Guarde o `.env` fora do controlo de versão e use uma estratégia controlada para migrations e backups.
