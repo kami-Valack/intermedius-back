@@ -15,6 +15,8 @@ services:
       APP_ENV: production
       APP_DEBUG: "false"
       APP_URL: ${APP_URL:-http://localhost:3043}
+      GPO_SSL_VERIFY: "true"
+      OMBALA_SSL_VERIFY: "true"
       DB_CONNECTION: mysql
       DB_HOST: ${COMPOSE_DB_HOST:-host.docker.internal}
     healthcheck:
@@ -40,6 +42,8 @@ services:
     environment:
       APP_ENV: production
       APP_DEBUG: "false"
+      GPO_SSL_VERIFY: "true"
+      OMBALA_SSL_VERIFY: "true"
       DB_CONNECTION: mysql
       DB_HOST: ${COMPOSE_DB_HOST:-host.docker.internal}
     depends_on:
