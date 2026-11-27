@@ -16,4 +16,8 @@ if [ "${APP_ENV:-local}" = "local" ]; then
     php artisan db:seed --force
 fi
 
+if [ ! -L public/storage ]; then
+    php artisan storage:link
+fi
+
 exec "$@"

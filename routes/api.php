@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AgentLinkController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AvailabilityController;
+use App\Http\Controllers\Api\BankDetailsController;
 use App\Http\Controllers\Api\CommissionController;
 use App\Http\Controllers\Api\CommunityController;
 use App\Http\Controllers\Api\FavoriteController;
@@ -30,6 +31,8 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/auth/me', [AuthController::class, 'me']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
+        Route::get('/bank-details', [BankDetailsController::class, 'show']);
+        Route::put('/bank-details', [BankDetailsController::class, 'update']);
 
         Route::get('/properties/mine', [PropertyController::class, 'mine']);
         Route::post('/properties', [PropertyController::class, 'store']);
@@ -69,6 +72,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/properties', [AdminController::class, 'properties']);
             Route::patch('/properties/{property}', [AdminController::class, 'reviewProperty']);
             Route::get('/payments', [AdminController::class, 'payments']);
+            Route::get('/owner-payouts', [AdminController::class, 'ownerPayouts']);
             Route::get('/settings', [AdminController::class, 'settings']);
             Route::put('/settings', [AdminController::class, 'saveSettings']);
         });

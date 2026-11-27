@@ -77,6 +77,36 @@ class AdminController extends Controller
         return PaymentResource::collection(Payment::query()->latest()->paginate(50));
     }
 
+    public function ownerPayouts(Request $request)
+    {
+        $payouts = Rental::query()
+            ->selectRaw('owner_id, SUM(monthly_rent) as monthly_amount_due, COUNT(*) as active_rentals_count')
+            ->where('status', Rental::STATUS_ACTIVE)
+            ->groupBy('owner_id')
+            ->with('owner:id,name,email,iban,express_number')
+            ->orderBy('owner_id')
+            ->paginate(max(1, min((int) $request->input('per_page', 20), 50)));
+
+        $payouts->getCollection()->transform(function (Rental $rental) {
+            return [
+                'owner' => [
+                    'id' => $rental->owner->id,
+                    'name' => $rental->owner->name,
+                    'email' => $rental->owner->email,
+                ],
+                'monthly_amount_due' => (int) $rental->monthly_amount_due,
+                'active_rentals_count' => (int) $rental->active_rentals_count,
+                'currency' => config('intermediarius.currency'),
+                'destination' => [
+                    'iban' => $rental->owner->iban,
+                    'express_number' => $rental->owner->express_number,
+                ],
+            ];
+        });
+
+        return response()->json($payouts);
+    }
+
     public function settings(SettingsService $settings)
     {
         return response()->json($settings->all());

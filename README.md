@@ -19,11 +19,11 @@ php artisan migrate --seed
 
 ### Executar com Docker Compose
 
-Requer Docker Engine e Docker Compose. O Compose inicia a API na porta `3043` e o scheduler Laravel; conecta ao MySQL já existente na VPS pela porta `3306`. Na primeira inicialização gera `APP_KEY` e executa as migrations. O Compose fixa `APP_ENV=production`, portanto não cria contas de demonstração.
+Requer Docker Engine e Docker Compose. O Compose inicia a API na porta `3043` e o scheduler Laravel; conecta ao MySQL já existente na VPS pela porta `3306`. Na primeira inicialização gera `APP_KEY`, executa as migrations e cria o link `public/storage`. O Compose fixa `APP_ENV=production`, portanto não cria contas de demonstração.
 
 ```powershell
 if (-not (Test-Path .env)) { Copy-Item .env.example .env }
-# Configure APP_URL, DB_DATABASE, DB_USERNAME, DB_PASSWORD e as credenciais Ombala/GPO no .env.
+# Configure APP_URL, FRONTEND_URL, DB_DATABASE, DB_USERNAME, DB_PASSWORD e as credenciais Ombala/GPO no .env.
 docker-compose up --build -d
 docker-compose logs -f app
 ```

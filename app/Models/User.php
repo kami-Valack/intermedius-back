@@ -23,10 +23,11 @@ class User extends Authenticatable
     protected $fillable = [
         'name', 'email', 'phone', 'nif', 'role', 'status',
         'document_path', 'document_name', 'password', 'phone_verified_at',
+        'iban', 'express_number',
     ];
 
     protected $hidden = [
-        'password', 'remember_token', 'document_path',
+        'password', 'remember_token', 'document_path', 'iban', 'express_number',
     ];
 
     protected $casts = [

@@ -153,9 +153,7 @@ class VisitService
             ->where('status', AgentLink::STATUS_APPROVED)
             ->pluck('agent_id');
 
-        if ($property->owner && $property->owner->role === User::ROLE_AGENT) {
-            $agentIds = $agentIds->push($property->user_id)->unique();
-        }
+        $agentIds = $agentIds->push($property->user_id)->unique();
 
         $isoDay = (int) $scheduledAt->isoWeekday();
         $time = $scheduledAt->format('H:i');

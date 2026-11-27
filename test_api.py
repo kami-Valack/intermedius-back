@@ -85,7 +85,7 @@ class ApiTester:
         try:
             is_loopback = ipaddress.ip_address(hostname).is_loopback
         except ValueError:
-            is_loopback = hostname.lower() == "localhost"
+            is_loopback = hostname.lower() == "intermed.api.drip.infinityfree.me"
         if parsed.scheme not in ("http", "https") or not is_loopback:
             raise ValueError("Por segurança, o script só aceita URL local (localhost/loopback).")
 
